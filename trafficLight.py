@@ -20,21 +20,6 @@ net.setInputScale(1.0/127.5)
 net.setInputMean((127.5,127.5,127.5))
 net.setInputSwapRB(True)
 
-def polygonArea(X, Y, n):
-  
-    # Initialize area
-    area = 0.0
-  
-    # Calculate value of shoelace formula
-    j = n - 1
-    for i in range(0,n):
-        area += (X[j] + X[i]) * (Y[j] - Y[i])
-        j = i   # j is previous vertex to i
-      
-  
-    # Return absolute value
-    return int(abs(area / 2.0))
-
 #classIds, cofs, bbox = net.detect()
 while True:
         result, frame = cap.read()
