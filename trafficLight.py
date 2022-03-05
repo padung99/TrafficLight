@@ -29,9 +29,10 @@ while True:
         if len(classIds) != 0:
                 for classId, confidence, box in zip(classIds.flatten(), confs.flatten(), bbox):       
                         if(objName[classId-1] == "traffic light"):
-                                frame_tl = cv2.rectangle(frame, box, color = (100,255,220), thickness=2) #Take sub frame from traffic light
-                                cv2.putText(frame, objName[classId-1], (box[0] +10, box[1] +30), cv2.FONT_HERSHEY_COMPLEX,1,(100,255,220),2)
-                                
+                                frame_tl = cv2.rectangle(frame, box, color = (255,0,0), thickness=2) #Take sub frame from traffic light
+                                cv2.putText(frame, objName[classId-1], (box[0] +10, box[1]-9), cv2.FONT_HERSHEY_COMPLEX,1,(255,0,0),2)
+                                cv2.putText(frame, str(confidence), (box[0] -40, box[1] -35), cv2.FONT_HERSHEY_COMPLEX,1,(255,0,0),2)
+
                                 hsvFrame = cv2.cvtColor(frame_tl, cv2.COLOR_BGR2HSV)
                                 ###################Red
                                 red_lower = np.array([0, 100, 100], np.uint8)
@@ -56,7 +57,7 @@ while True:
                                                 if area_red > 3000:
                                                         x, y, w, h = cv2.boundingRect(contour)
                                                         frame_color_red = cv2.rectangle(frame_tl, (x, y), (x + w, y + h), (0, 0, 255), 2)   
-                                                        cv2.putText(frame_color_red, "Red", (x, y),cv2.FONT_HERSHEY_SIMPLEX, 1.0,(0, 0, 255))
+                                                        cv2.putText(frame_color_red, "Red", (x +150 , y +55),cv2.FONT_HERSHEY_SIMPLEX, 1.0,(0, 0, 255), 2)
 
                                 # #################################Grreen
                                 green_lower = np.array([50, 100, 100], np.uint8)
@@ -74,7 +75,7 @@ while True:
                                                 if area_green > 3000:
                                                         x, y, w, h = cv2.boundingRect(contour)
                                                         frame_color_green = cv2.rectangle(frame_tl, (x, y), (x + w, y + h), (0, 255, 0), 2)   
-                                                        cv2.putText(frame_color_green, "Green", (x, y),cv2.FONT_HERSHEY_SIMPLEX, 1.0,(0, 255, 0))
+                                                        cv2.putText(frame_color_green, "Green", (x +150 , y +55),cv2.FONT_HERSHEY_SIMPLEX, 1.0,(0, 255, 0),2)
 
                                 ####################Yellow
                                 yellow_lower = np.array([28, 100, 100], np.uint8)
@@ -91,8 +92,8 @@ while True:
                                                 print(area_yellow)
                                                 if area_yellow > 3000:
                                                         x, y, w, h = cv2.boundingRect(contour)
-                                                        frame_color_yellow = cv2.rectangle(frame_tl, (x, y), (x + w, y + h), (250, 253, 15), 2)   
-                                                        cv2.putText(frame_color_yellow, "Yellow", (x, y),cv2.FONT_HERSHEY_SIMPLEX, 1.0,(250, 253, 15))
+                                                        frame_color_yellow = cv2.rectangle(frame_tl, (x, y), (x + w, y + h), (100,255,220), 2)   
+                                                        cv2.putText(frame_color_yellow, "Yellow", (x +150 , y +55),cv2.FONT_HERSHEY_SIMPLEX, 1.0,(100,255,220),2)
 
  
                                 
