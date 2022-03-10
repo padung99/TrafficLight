@@ -20,6 +20,9 @@ net.setInputScale(1.0/127.5)
 net.setInputMean((127.5,127.5,127.5))
 net.setInputSwapRB(True)
 
+def PolyArea(x,y): # implementation of Shoelace formula 
+    return 0.5*np.abs(np.dot(x,np.roll(y,1))-np.dot(y,np.roll(x,1)))
+
 #classIds, cofs, bbox = net.detect()
 while True:
         result, frame = cap.read()
@@ -39,8 +42,11 @@ while True:
                                 red_upper = np.array([10, 255, 255], np.uint8)
                                 red_mask = cv2.inRange(hsvFrame, red_lower, red_upper)
                                 print(classId, box)
-
-                        
+                                x_tl = np.array([box[0], box[2], box[2], box[0]])
+                                y_tl = np.array([box[1], box[1], box[3], box[3]])
+                                S_tl = PolyArea(x_tl, y_tl)
+                                edge_tl = abs(box[3] - box[1])
+                                #print(S_tl)
                                 # area_tl = abs(box[0]-box[2])*abs(box[1]-box[3])
                                 # print(area_tl)
 
@@ -53,11 +59,21 @@ while True:
 
                                 for pic, contour in enumerate(contours_red):
                                                 area_red = cv2.contourArea(contour)
-                                                print(area_red)
-                                                if area_red > 3000:
-                                                        x, y, w, h = cv2.boundingRect(contour)
-                                                        frame_color_red = cv2.rectangle(frame_tl, (x, y), (x + w, y + h), (0, 0, 255), 2)   
-                                                        cv2.putText(frame_color_red, "Red", (x +150 , y +55),cv2.FONT_HERSHEY_SIMPLEX, 1.0,(0, 0, 255), 2)
+                                                #print(area_red)
+                                                #if area_red > 3000:
+                                                x, y, w, h = cv2.boundingRect(contour)
+                                                x_color = np.array([x , x+w, x+w, x])
+                                                y_color = np.array([y, y, y+h, y+h])
+                                                S_color = PolyArea(x_color, y_color)
+                                                print(h/w)
+
+                                                if  h/edge_tl > 0.24: #Condition for determinating traffic light signal
+                                                        if w/h  <= 0.8:
+                                                                frame_color_red = cv2.rectangle(frame_tl, (x, y), (x + w, y + h), (0, 0, 255), 2)   
+                                                                cv2.putText(frame_color_red, "Invalid", (x ,y),cv2.FONT_HERSHEY_SIMPLEX, 1.0,(0, 0, 255), 2) 
+                                                        else:
+                                                                frame_color_red = cv2.rectangle(frame_tl, (x, y), (x + w, y + h), (0, 0, 255), 2)   
+                                                                cv2.putText(frame_color_red, "Red", (x ,y),cv2.FONT_HERSHEY_SIMPLEX, 1.0,(0, 0, 255), 2)
 
                                 # #################################Grreen
                                 green_lower = np.array([50, 100, 100], np.uint8)
@@ -71,11 +87,20 @@ while True:
 
                                 for pic, contour in enumerate(contours_green):
                                                 area_green = cv2.contourArea(contour)
-                                                print(area_green)
-                                                if area_green > 3000:
-                                                        x, y, w, h = cv2.boundingRect(contour)
-                                                        frame_color_green = cv2.rectangle(frame_tl, (x, y), (x + w, y + h), (0, 255, 0), 2)   
-                                                        cv2.putText(frame_color_green, "Green", (x +150 , y +55),cv2.FONT_HERSHEY_SIMPLEX, 1.0,(0, 255, 0),2)
+                                                #print(area_green)
+                                                x, y, w, h = cv2.boundingRect(contour)
+                                                x_color = np.array([x , x+w, x+w, x])
+                                                y_color = np.array([y, y, y+h, y+h])
+                                                S_color = PolyArea(x_color, y_color)
+                                                print(h/w)
+
+                                                if  h/edge_tl > 0.24: #Condition for determinating traffic light signal
+                                                        if w/h  <= 0.8:
+                                                                frame_color_green = cv2.rectangle(frame_tl, (x, y), (x + w, y + h), (0, 255, 0), 2)   
+                                                                cv2.putText(frame_color_green, "Invalid", (x ,y),cv2.FONT_HERSHEY_SIMPLEX, 1.0,(0, 255, 0), 2) 
+                                                        else:
+                                                                frame_color_red = cv2.rectangle(frame_tl, (x, y), (x + w, y + h), (0, 0, 255), 2)   
+                                                                cv2.putText(frame_color_green, "green", (x ,y),cv2.FONT_HERSHEY_SIMPLEX, 1.0,(0, 255, 0), 2)
 
                                 ####################Yellow
                                 yellow_lower = np.array([28, 100, 100], np.uint8)
@@ -86,14 +111,23 @@ while True:
                                 contours_yellow, hierarchy_yellow = cv2.findContours(yellow_mask,
                                                                 cv2.RETR_TREE,
                                                                 cv2.CHAIN_APPROX_SIMPLE)
-
+                                #100,255,220
                                 for pic, contour in enumerate(contours_yellow):
                                                 area_yellow = cv2.contourArea(contour)
-                                                print(area_yellow)
-                                                if area_yellow > 3000:
-                                                        x, y, w, h = cv2.boundingRect(contour)
-                                                        frame_color_yellow = cv2.rectangle(frame_tl, (x, y), (x + w, y + h), (100,255,220), 2)   
-                                                        cv2.putText(frame_color_yellow, "Yellow", (x +150 , y +55),cv2.FONT_HERSHEY_SIMPLEX, 1.0,(100,255,220),2)
+                                                #print(area_yellow)
+                                                x, y, w, h = cv2.boundingRect(contour)
+                                                x_color = np.array([x , x+w, x+w, x])
+                                                y_color = np.array([y, y, y+h, y+h])
+                                                S_color = PolyArea(x_color, y_color)
+                                                print(h/w)
+
+                                                if  h/edge_tl > 0.24: #Condition for determinating traffic light signal
+                                                        if w/h  <= 0.8:
+                                                                frame_color_yellow = cv2.rectangle(frame_tl, (x, y), (x + w, y + h), (100,255,220), 2)   
+                                                                cv2.putText(frame_color_yellow, "Invalid", (x ,y),cv2.FONT_HERSHEY_SIMPLEX, 1.0,(100,255,220), 2) 
+                                                        else:
+                                                                frame_color_yellow = cv2.rectangle(frame_tl, (x, y), (x + w, y + h), (100,255,220), 2)   
+                                                                cv2.putText(frame_color_yellow, "Yellow", (x ,y),cv2.FONT_HERSHEY_SIMPLEX, 1.0,(100,255,220), 2)
 
  
                                 
@@ -106,3 +140,4 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
+
